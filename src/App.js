@@ -2,6 +2,9 @@ import React, { useState, useMemo } from 'react';
 import Plot from 'react-plotly.js';
 
 function checkPower(base, exponent) {
+  if (exponent === 0) {
+    return [1];
+  }
   // Handle special cases
   if (base === 0 && exponent <= 0) return NaN;
   if (exponent === 0) return 1;
@@ -112,10 +115,14 @@ const EquationPlotter = () => {
       return { x: [], y: [] };
     }
 
+
     try {
       const points = { x: [], y: [] };
       const { start, end } = range;
-      const step = (end - start) / 200;
+
+
+      const isPowerWithNegativeBase = equation.expression.match(/pow\s*\(\s*-\d+/);
+      const step = isPowerWithNegativeBase ? 1 : (end - start) / 200;
 
       const evalExpr = (expr, vars) => {
         const mathFuncs = {
@@ -418,7 +425,7 @@ const EquationPlotter = () => {
               x: plotData.x,
               y: plotData.y,
               type: 'scatter',
-              mode: 'lines',
+              mode: 'lines+markers',
               line: {color: '#c35528'}
             }]}
             layout={darkPlotLayout}
